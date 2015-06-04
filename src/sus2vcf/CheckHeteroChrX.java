@@ -22,13 +22,13 @@ public class CheckHeteroChrX extends Thread{
 	public CheckHeteroChrX(ArrayList<String> filelist){
 		this.filelist = filelist;
 	}
-	
+
 	public void run(){
 		for(String filename: filelist){
 			long time = System.currentTimeMillis();
 			String[] filenames = filename.split("/");
 			String fileType;
-			
+
 			try{
 				filename = filename.replaceAll("chr1", "chrX");
 				FileInputStream fis = new FileInputStream(filename);
@@ -62,16 +62,18 @@ public class CheckHeteroChrX extends Thread{
 					if(line.startsWith("chrX") && !line.contains("INDEL")){
 						String[] data = line.split("\t");
 						int pos = Integer.parseInt(data[1]);
-						float qual = Float.parseFloat(data[5]);
-						String alt = data[4];
-						if(pos > 2699520 && pos < 154931044 && qual >= 70.0){
-							if(!alt.equals(".")){
-								String[] genotype = data[9].split(":");
-								if(genotype[0].equals("0/1")){
-									hetero ++;
-								}
-								else if(genotype[0].equals("1/1")){
-									homo ++;
+						if(!data[5].equals(".")){
+							float qual = Float.parseFloat(data[5]);
+							if(pos > 2699520 && pos < 154931044 && qual >= 70.0){
+								String alt = data[4];
+								if(!alt.equals(".")){
+									String[] genotype = data[9].split(":");
+									if(genotype[0].equals("0/1")){
+										hetero ++;
+									}
+									else if(genotype[0].equals("1/1")){
+										homo ++;
+									}
 								}
 							}
 						}
@@ -106,11 +108,13 @@ public class CheckHeteroChrX extends Thread{
 	public static void main(String[] args) {
 		ArrayList<CheckHeteroChrX> threads = new ArrayList<CheckHeteroChrX>();
 		int numThreads = 30;
-		
+
 		if (args.length < 1) {
 			System.err.println("arg1: consensus file list");
 			System.exit(1);
 		}
+
+		System.err.println("Start CheckHeteroChrX ver. 2015060402");
 
 		try {
 			FileInputStream fls = new FileInputStream(args[0]);
@@ -133,13 +137,13 @@ public class CheckHeteroChrX extends Thread{
 					threads.add(checkHeteroChrX);
 					f = new ArrayList<String>();
 				}
-//				if(threads.size()>=30){
-//					for(CheckHeteroChrX thread: threads){
-//						thread.join();
-//						System.out.println(thread.getValue());
-//					}
-//					threads = new ArrayList<CheckHeteroChrX>();
-//				}
+				//				if(threads.size()>=30){
+				//					for(CheckHeteroChrX thread: threads){
+				//						thread.join();
+				//						System.out.println(thread.getValue());
+				//					}
+				//					threads = new ArrayList<CheckHeteroChrX>();
+				//				}
 			}
 			if(f.size() >= 0){
 				CheckHeteroChrX checkHeteroChrX = new CheckHeteroChrX(f);
