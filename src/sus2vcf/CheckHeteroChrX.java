@@ -64,7 +64,7 @@ public class CheckHeteroChrX extends Thread{
 						int pos = Integer.parseInt(data[1]);
 						if(!data[5].equals(".")){
 							float qual = Float.parseFloat(data[5]);
-							if(pos > 2699520 && pos < 154931044 && qual >= 70.0){
+							if(pos > 2699520 && pos < 154931044 && qual >= 70.0 && countDP(data[7]) >= 10){
 								String alt = data[4];
 								if(!alt.equals(".")){
 									String[] genotype = data[9].split(":");
@@ -97,6 +97,17 @@ public class CheckHeteroChrX extends Thread{
 		}
 	}
 
+	private int countDP(String info) {
+		String[] info_parts = info.split(";");
+		for(String parts : info_parts){
+			String[] s = parts.split("=");
+			if(s[0].equals("DP")){
+				return Integer.parseInt(s[1]);
+			}
+		}
+		return 0;
+	}
+
 	public String getValue(){
 		return result.toString();
 	}
@@ -114,7 +125,7 @@ public class CheckHeteroChrX extends Thread{
 			System.exit(1);
 		}
 
-		System.err.println("Start CheckHeteroChrX ver. 2015060402");
+		System.err.println("Start CheckHeteroChrX ver. 2015061101");
 
 		try {
 			FileInputStream fls = new FileInputStream(args[0]);
