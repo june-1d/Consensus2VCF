@@ -13,29 +13,33 @@ import org.apache.commons.compress.compressors.CompressorInputStream;
 import org.apache.commons.compress.compressors.bzip2.BZip2CompressorInputStream;
 
 public class FileOpen{
-	FileInputStream fis;
-	BufferedReader br;
-
+	private FileInputStream fis;
+	private BufferedReader br;
+	private String fileType = "TEXT";
+	
 	public FileOpen(String filename) throws IOException{
 		fis = new FileInputStream(filename);
 		InputStream in;
 		if(filename.endsWith(".gz")){
-			System.err.println("Read:" + filename + ":GZIP");
+			// System.err.println("Read:" + filename + ":GZIP");
+			fileType = "GZIP";
 			BufferedInputStream bis = new BufferedInputStream(fis);
 			in = new GZIPInputStream(bis);
 		}
 		else if(filename.endsWith(".zip")){
-			System.err.println("Read:" + filename + ":ZIP");
+			// System.err.println("Read:" + filename + ":ZIP");
+			fileType = "ZIP";
 			BufferedInputStream bis = new BufferedInputStream(fis);
 			in = new ZipInputStream(bis);
 		}
 		else if(filename.endsWith(".bz2")){
-			System.err.println("Read:" + filename + ":BZIP2");
+			// System.err.println("Read:" + filename + ":BZIP2");
+			fileType = "BZIP2";
 			BufferedInputStream bis = new BufferedInputStream(fis);
 			in = new MultiStreamBZip2InputStream(bis);
 		}
 		else{
-			System.err.println("Read:" + filename + ":TEXT");
+			// System.err.println("Read:" + filename + ":TEXT");
 			in = new BufferedInputStream(fis);
 		}
 		br = new BufferedReader(new InputStreamReader(in));
@@ -50,6 +54,10 @@ public class FileOpen{
 		br.close();
 	}
 
+	public String getFileType(){
+		return fileType;
+	}
+	
 	/**
 	 * Handle multistream BZip2 files.
 	 */
