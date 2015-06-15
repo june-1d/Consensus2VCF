@@ -12,13 +12,20 @@ public class Consensus2Gntyp{
 	private String fileList;
 	private String chr;
 	private String checkSexFile;
+	private String output;
 	private HashMap<String, Boolean> checkSex;
 	private TreeMap<Long, GntypLine> genotype;
 
-	public Consensus2Gntyp(String fileList, String chr, String checkSexFile){
+	public Consensus2Gntyp(String fileList, String chr, String checkSexFile, String output){
 		this.fileList = fileList;
 		this.chr = chr;
 		this.checkSexFile = checkSexFile;
+		this.output = output;
+		File outputFile = new File(output);
+		if(outputFile.exists()){
+			System.err.println(output + " already exists!");
+			System.exit(1);
+		}
 		genotype = new TreeMap<Long, GntypLine>();
 	}
 
@@ -144,7 +151,7 @@ public class Consensus2Gntyp{
 	}
 
 	/**
-	 * check !PAR && (chrX || chrY)
+	 * check (chrX || chrY) && !PAR
 	 * @param chr
 	 * @param posString
 	 * @return notPAR
@@ -184,8 +191,8 @@ public class Consensus2Gntyp{
 		return 0;
 	}
 
-	public void printGenotype(String fileName) throws IOException {
-		FileWriter fw = new FileWriter(new File(fileName));
+	public void printGenotype() throws IOException {
+		FileWriter fw = new FileWriter(new File(output));
 		BufferedWriter bw = new BufferedWriter(fw);
 		for(Long pos : genotype.keySet()){
 			bw.write(chr + "\t" + pos + "\t" + genotype.get(pos));
@@ -205,14 +212,16 @@ public class Consensus2Gntyp{
 			System.err.println("arg4: output file name");
 			System.exit(1);
 		}
-		Consensus2Gntyp consensus2Gntyp = new Consensus2Gntyp(args[0], args[1], args[2]);
+		Consensus2Gntyp consensus2Gntyp = new Consensus2Gntyp(args[0], args[1], args[2], args[3]);
 		try {
 			long time = System.currentTimeMillis();
 			consensus2Gntyp.readSexFile();
 			System.err.println("Finish read check sex:" + ((System.currentTimeMillis() - time)/1000.0) + "sec.");
+			time = System.currentTimeMillis();
 			consensus2Gntyp.makeGntyp();
 			System.err.println("Finish read consensus:" + ((System.currentTimeMillis() - time)/1000.0) + "sec.");
-			consensus2Gntyp.printGenotype(args[3]);
+			time = System.currentTimeMillis();
+			consensus2Gntyp.printGenotype();
 			System.err.println("Finish output:" + ((System.currentTimeMillis() - time)/1000.0) + "sec.");
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
